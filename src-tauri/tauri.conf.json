@@ -6,12 +6,15 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "brain-freeze",
+    "productName": "shortcuts",
     "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
       "all": false,
+      "dialog": {
+        "all": true
+      },
       "shell": {
         "all": false,
         "open": true
@@ -20,7 +23,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "shortcuts.tihomir-selak.from.hr",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -36,7 +39,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "brain-freeze",
+        "title": "shortcuts",
         "width": 800,
         "height": 600
       }

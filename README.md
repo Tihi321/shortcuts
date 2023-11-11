@@ -2,6 +2,27 @@
 
 Shortcuts is app for starting tools on disk
 
-## Recommended IDE Setup
+### Start
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+```bash
+cargo run ./main.rs
+```
+
+### Start
+
+```bash
+yarn tauri dev
+```
+
+### Rust Update
+
+```bash
+cd ./src-tauri
+cargo update
+```
+
+#### Default export
+
+```bash
+tauri build
+```

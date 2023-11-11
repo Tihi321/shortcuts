@@ -1,86 +1,87 @@
-import { createSignal } from "solid-js";
-import { invoke } from "@tauri-apps/api/tauri";
-import { styled, css } from "solid-styled-components";
+import { createSignal, createEffect } from "solid-js";
+import { styled } from "solid-styled-components";
+import { emit, listen } from "@tauri-apps/api/event";
+import { MESSAGES } from "./constants";
+import { Button } from "./components/inputs/Button";
+import { TextInput } from "./components/inputs/TextInput";
+import { Logo } from "./components/assets/Logo";
+import isEmpty from "lodash/isEmpty";
+import { openFile } from "./hooks/file";
 
 const Container = styled("div")`
   margin: 0;
-  padding-top: 10vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
 `;
 
-const Logo = styled("img")`
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+const Header = styled("div")`
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: ${(props) => props?.theme?.colors.ui5};
 `;
 
-const vite = css`
-  &:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
+const Title = styled("h2")`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: default;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  color: ${(props) => props?.theme?.colors.text};
 `;
 
-const tauri = css`
-  &:hover {
-    filter: drop-shadow(0 0 2em #24c8db);
-  }
+const Main = styled("div")`
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  margin-bottom: 8px;
 `;
 
-const solid = css`
-  &:hover {
-    filter: drop-shadow(0 0 2em #2f5d90);
-  }
-`;
+export const App = () => {
+  const [path, setPath] = createSignal("");
+  const [title, setTitle] = createSignal("");
 
-function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [name, setName] = createSignal("");
+  createEffect(() => {
+    const unlisten = listen(MESSAGES.ADD_SHORTCUT, (event: any) => {
+      console.log(event);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name: name() }));
-  }
+      // Cleanup listener when component is unmounted
+      return () => unlisten.then((fn) => fn());
+    });
+  });
 
   return (
     <Container>
-      <h1>Welcome to Tauri!</h1>
-
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <Logo src="/vite.svg" class={vite} alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <Logo src="/tauri.svg" class={tauri} alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <Logo src="/solid.svg" class={solid} alt="Solid logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-
-      <p>{greetMsg()}</p>
+      <Header>
+        <Logo url="\" />
+        <Title>Shortcuts</Title>
+      </Header>
+      <Main>
+        <Button
+          onClick={async () => {
+            const selected = (await openFile()) as string;
+            setPath(selected);
+          }}
+        >
+          Select Path
+        </Button>
+        {path()}
+        <TextInput onChange={setTitle} placeholder="Enter a title..." />
+        <Button
+          disabled={isEmpty(title()) || isEmpty(path())}
+          onClick={() => {
+            emit(MESSAGES.ADD_SHORTCUT, { title: title(), path: path() });
+          }}
+        >
+          Add shortcut
+        </Button>
+      </Main>
     </Container>
   );
-}
-
-export default App;
+};

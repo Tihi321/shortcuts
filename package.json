@@ -1,5 +1,5 @@
 {
-  "name": "brain-freeze",
+  "name": "shortcuts",
   "version": "0.0.0",
   "description": "",
   "type": "module",
@@ -13,6 +13,8 @@
   "license": "MIT",
   "dependencies": {
     "@tauri-apps/api": "^1.5.1",
+    "@types/lodash": "^4.14.201",
+    "lodash": "^4.17.21",
     "solid-js": "^1.7.8",
     "solid-styled-components": "^0.28.5"
   },
