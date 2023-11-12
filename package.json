@@ -13,13 +13,15 @@
   "license": "MIT",
   "dependencies": {
     "@tauri-apps/api": "^1.5.1",
-    "@types/lodash": "^4.14.201",
     "lodash": "^4.17.21",
     "solid-js": "^1.7.8",
-    "solid-styled-components": "^0.28.5"
+    "solid-styled-components": "^0.28.5",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.6",
+    "@types/lodash": "^4.14.201",
+    "@types/uuid": "^9.0.7",
     "typescript": "^5.0.2",
     "vite": "^4.4.4",
     "vite-plugin-solid": "^2.7.0"

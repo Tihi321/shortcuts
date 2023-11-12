@@ -11,12 +11,16 @@ const Input = styled("input")`
   line-height: 16px;
   letter-spacing: 0px;
   border-radius: 6px;
-  text-align: center;
+  text-align: left;
   color: ${(props) => props?.theme?.colors.text};
   background: ${(props) => props?.theme?.colors.ui5};
   border-width: 3px;
   border-style: solid;
   border-color: ${(props) => props?.theme?.colors.ui6};
+
+  &::placeholder {
+    color: ${(props) => props?.theme?.colors.text};
+  }
 `;
 
 export const TextInput = ({ onChange, placeholder, value }: any) => {

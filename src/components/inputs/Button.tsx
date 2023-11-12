@@ -14,12 +14,22 @@ export const Button = styled("button")`
   letter-spacing: 0px;
   text-align: center;
   color: ${(props) => props?.theme?.colors.text};
-  background: ${(props) => props?.theme?.colors.ui1};
+  background-color: ${(props) => {
+    switch (props?.name) {
+      case "secondary":
+        return props?.theme?.colors.ui3;
+      case "warning":
+        return props?.theme?.colors.ui4;
+
+      default:
+        return props?.theme?.colors.ui2;
+    }
+  }};
   border-radius: 6px;
   border-width: 3px;
   border-style: solid;
   border-color: ${(props) => props?.theme?.colors.ui6};
-  transition: opacity 0.3s ease, background 0.3s ease;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
 
   &:hover,
   &:active,
@@ -28,22 +38,16 @@ export const Button = styled("button")`
   }
 
   &:hover {
-    opacity: 0.9;
-
-    background: ${(props) => alpha(props?.theme?.colors.ui1, 0.3)};
+    filter: ${(props) => `drop-shadow(2px 1px 2px ${props?.theme?.colors.ui6})`};
   }
 
+  &:focus,
   &:active {
-    opacity: 0.8;
-
-    background: ${(props) => alpha(props?.theme?.colors.ui1, 0.2)};
-  }
-
-  &:focus {
-    outline: 2px solid ${(props) => alpha(props?.theme?.colors.ui1, 0.2)};
+    outline: 2px solid ${(props) => alpha(props?.theme?.colors.ui1, 0.4)};
   }
 
   &:disabled {
-    opacity: 0.7;
+    cursor: no-drop;
+    filter: grayscale(0.5);
   }
 `;
