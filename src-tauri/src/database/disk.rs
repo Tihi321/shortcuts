@@ -17,8 +17,17 @@ pub fn remove_shortcut(shortcuts: &mut Shortcuts, id: String) {
 }
 
 pub fn update_shortcut(shortcuts: &mut Shortcuts, shortcut: Shortcut) {
-    shortcuts.items.retain(|value| value.id != shortcut.id);
-    shortcuts.items.push(shortcut);
+    if let Some(item) = shortcuts
+        .items
+        .iter_mut()
+        .find(|value| value.id == shortcut.id)
+    {
+        *item = shortcut;
+    } else {
+        // If the item is not found, you might want to handle this case,
+        // for example, by adding the new item to the list.
+        shortcuts.items.push(shortcut);
+    }
 }
 
 pub fn read_shortcuts_from_file<P: AsRef<Path>>(file_path: P) -> Result<Shortcuts> {
