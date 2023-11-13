@@ -10,5 +10,5 @@ pub struct Shortcut {
 
 #[derive(Serialize, Deserialize)]
 pub struct Shortcuts {
-    pub(crate) shortcuts: Vec<Shortcut>,
+    pub(crate) items: Vec<Shortcut>,
 }

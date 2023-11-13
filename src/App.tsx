@@ -138,7 +138,7 @@ export const App = () => {
 
       try {
         const data = JSON.parse(payload);
-        const dbShortcuts = get(data, ["shortcuts"], []);
+        const dbShortcuts = get(data, ["items"], []);
         setShortcuts(dbShortcuts);
       } catch (error) {
         console.log(error);
@@ -200,7 +200,7 @@ export const App = () => {
                 </ItemButtons>
                 <ItemFooter>
                   <Checkbox
-                    label="Visibility"
+                    label="Hidden (shell)"
                     checked={isEqual(get(values, ["visibility"]), VISIBILITY.HIDDEN)}
                     onChange={(value) => {
                       emit(MESSAGES.UPDATE_SHORTCUT, {

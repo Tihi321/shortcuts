@@ -9,18 +9,16 @@ use super::constants::DATABASE_PATH;
 use super::structs::{Shortcut, Shortcuts};
 
 pub fn add_shortcut(shortcuts: &mut Shortcuts, shortcut: Shortcut) {
-    shortcuts.shortcuts.push(shortcut);
+    shortcuts.items.push(shortcut);
 }
 
 pub fn remove_shortcut(shortcuts: &mut Shortcuts, id: String) {
-    shortcuts.shortcuts.retain(|shortcut| shortcut.id != id);
+    shortcuts.items.retain(|value| value.id != id);
 }
 
 pub fn update_shortcut(shortcuts: &mut Shortcuts, shortcut: Shortcut) {
-    shortcuts
-        .shortcuts
-        .retain(|shortcut| shortcut.id != shortcut.id);
-    shortcuts.shortcuts.push(shortcut);
+    shortcuts.items.retain(|value| value.id != shortcut.id);
+    shortcuts.items.push(shortcut);
 }
 
 pub fn read_shortcuts_from_file<P: AsRef<Path>>(file_path: P) -> Result<Shortcuts> {
@@ -30,9 +28,8 @@ pub fn read_shortcuts_from_file<P: AsRef<Path>>(file_path: P) -> Result<Shortcut
 }
 
 pub fn read_shortcuts_from_file_as_string() -> String {
-    let shortcuts = read_shortcuts_from_file(DATABASE_PATH).unwrap_or_else(|_| Shortcuts {
-        shortcuts: Vec::new(),
-    });
+    let shortcuts =
+        read_shortcuts_from_file(DATABASE_PATH).unwrap_or_else(|_| Shortcuts { items: Vec::new() });
 
     // Serialize the shortcuts data to JSON
     let shortcuts_json = serde_json::to_string(&shortcuts).expect("Failed to serialize shortcuts");

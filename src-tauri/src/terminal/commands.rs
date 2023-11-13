@@ -1,5 +1,6 @@
 use std::io;
 use std::os::windows::process::CommandExt;
+use std::path::Path;
 use std::process::Command;
 use winapi::um::wincon::GetConsoleWindow;
 use winapi::um::winuser::{ShowWindow, UpdateWindow, SW_HIDE};
@@ -37,9 +38,16 @@ fn execute_hidden_command(command: &str) -> io::Result<bool> {
 
 pub fn start_service(service_path: &str, visibility: &str) -> io::Result<bool> {
     // Construct the PowerShell command to start the service
+    let path = Path::new(service_path);
+    let parent_folder = path
+        .parent()
+        .unwrap_or_else(|| Path::new("No parent directory found"));
+
     let start_service_command = format!(
-        "Start-Process -FilePath '{0}' -WindowStyle {1}",
-        service_path, visibility
+        "Start-Process -FilePath '{0}' -WindowStyle {1} -WorkingDirectory {2}",
+        service_path,
+        visibility,
+        parent_folder.display()
     );
 
     let _ = execute_hidden_command(&start_service_command);

@@ -42,9 +42,7 @@ fn main() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
                             let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts {
-                                    shortcuts: Vec::new(),
-                                });
+                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
 
                             add_shortcut(&mut shortcuts, shortcut);
 
@@ -74,9 +72,7 @@ fn main() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
                             let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts {
-                                    shortcuts: Vec::new(),
-                                });
+                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
 
                             remove_shortcut(&mut shortcuts, shortcut.id);
 
@@ -106,9 +102,7 @@ fn main() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
                             let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts {
-                                    shortcuts: Vec::new(),
-                                });
+                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
 
                             update_shortcut(&mut shortcuts, shortcut);
 
