@@ -2,6 +2,10 @@
 
 Shortcuts is app for starting tools on disk
 
+<div align="center">
+   <img alt="App" src="./assets/app.png" width="620" />
+</div>
+
 ### Start
 
 ```bash
