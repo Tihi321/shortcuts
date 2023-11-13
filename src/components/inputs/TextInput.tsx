@@ -1,5 +1,12 @@
 import { styled } from "solid-styled-components";
 
+type TTextInputProps = {
+  onChange: (value: any) => void;
+  placeholder?: string;
+  value: any;
+  name?: string;
+};
+
 const Input = styled("input")`
   display: inline-flex;
   display: inline-flex;
@@ -12,23 +19,32 @@ const Input = styled("input")`
   letter-spacing: 0px;
   border-radius: 6px;
   text-align: left;
-  color: ${(props) => props?.theme?.colors.text};
-  background: ${(props) => props?.theme?.colors.ui5};
+  color: ${(props) => props?.theme?.colors.ui6};
+  background-color: ${(props) => {
+    switch (props?.name) {
+      case "secondary":
+        return props?.theme?.colors.ui1;
+
+      default:
+        return props?.theme?.colors.ui3;
+    }
+  }};
   border-width: 3px;
   border-style: solid;
   border-color: ${(props) => props?.theme?.colors.ui6};
 
   &::placeholder {
-    color: ${(props) => props?.theme?.colors.text};
+    color: ${(props) => props?.theme?.colors.ui6};
   }
 `;
 
-export const TextInput = ({ onChange, placeholder, value }: any) => {
+export const TextInput = ({ onChange, placeholder, value, name }: TTextInputProps) => {
   return (
     <Input
-      onChange={(e) => onChange(e.currentTarget.value)}
+      onInput={(e) => onChange(e.currentTarget.value)}
       placeholder={placeholder}
       value={value}
+      name={name}
     />
   );
 };

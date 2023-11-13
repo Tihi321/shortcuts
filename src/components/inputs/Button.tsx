@@ -3,7 +3,6 @@ import { alpha } from "../../utils";
 
 export const Button = styled("button")`
   display: inline-flex;
-  display: inline-flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -18,15 +17,17 @@ export const Button = styled("button")`
     switch (props?.name) {
       case "secondary":
         return props?.theme?.colors.ui3;
+      case "tertiary":
+        return props?.theme?.colors.ui2;
       case "warning":
         return props?.theme?.colors.ui4;
 
       default:
-        return props?.theme?.colors.ui2;
+        return props?.theme?.colors.ui1;
     }
   }};
   border-radius: 6px;
-  border-width: 3px;
+  border-width: 2px;
   border-style: solid;
   border-color: ${(props) => props?.theme?.colors.ui6};
   transition: opacity 0.3s ease, background-color 0.3s ease;
