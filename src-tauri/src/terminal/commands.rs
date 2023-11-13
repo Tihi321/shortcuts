@@ -44,7 +44,7 @@ pub fn start_service(service_path: &str, visibility: &str) -> io::Result<bool> {
         .unwrap_or_else(|| Path::new("No parent directory found"));
 
     let start_service_command = format!(
-        "Start-Process -FilePath '{0}' -WindowStyle {1} -WorkingDirectory {2}",
+        "Start-Process -FilePath '{0}' -WindowStyle {1} -WorkingDirectory \"{2}\"",
         service_path,
         visibility,
         parent_folder.display()

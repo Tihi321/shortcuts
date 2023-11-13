@@ -132,6 +132,14 @@ export const App = () => {
   const [path, setPath] = createSignal("");
   const [name, setName] = createSignal("");
 
+  const filteredItems = () => {
+    const searchQuery = toLower(search());
+
+    return filter(shortcuts(), (item) => {
+      return includes(toLower(get(item, ["name"])), searchQuery);
+    });
+  };
+
   createEffect(() => {
     const unlisten = listen(MESSAGES.SHORTCUTS_UPDATE, (event: any) => {
       const payload = get(event, ["payload"], "{}");
@@ -150,11 +158,6 @@ export const App = () => {
   });
 
   createEffect(() => emit(MESSAGES.GET_SHORTCUT));
-
-  const filteredItems = () => {
-    const searchQuery = toLower(search());
-    return filter(shortcuts(), (item) => includes(toLower(item), searchQuery));
-  };
 
   return (
     <Container>
