@@ -20,6 +20,9 @@ import { Arrow } from "./components/icons/Arrow";
 import { Trashcan } from "./components/icons/Trashcan";
 import { Checkmark } from "./components/icons/Checkmark";
 import { Checkbox } from "./components/inputs/Checkbox";
+import { LockedInput } from "./components/inputs/LockedInput";
+import { LaunchIcon } from "./components/icons/Launch";
+import { HideContainer } from "./components/common/HideContainer";
 
 const Container = styled("div")`
   margin: 0;
@@ -53,6 +56,7 @@ const Item = styled("div")`
   padding: 8px;
   display: inline-flex;
   flex-direction: column;
+  gap: 8px;
   min-width: 50px;
   background-color: ${(props) => props?.theme?.colors.ui2};
   border-width: 2px;
@@ -64,6 +68,7 @@ const Item = styled("div")`
 const ItemButtons = styled("div")`
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 `;
 
 const ItemTitle = styled("div")`
@@ -79,7 +84,9 @@ const ItemHeader = styled("div")`
 `;
 
 const ItemFooter = styled("div")`
-  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const Main = styled("div")`
@@ -101,6 +108,8 @@ const Footer = styled("div")`
   flex-direction: row;
   padding: 8px;
   background-color: ${(props) => props?.theme?.colors.ui5};
+  opacity: ${(props) => (props?.datatype == "adding" ? 0.7 : 1)};
+  pointer-events: ${(props) => (props?.datatype == "adding" ? "none" : "all")};
 `;
 
 const HeaderSearch = styled("div")`
@@ -108,15 +117,24 @@ const HeaderSearch = styled("div")`
   flex-direction: row;
 `;
 
-const FooterIcon = styled("div")`
+const FooterItem = styled("div")`
   display: flex;
   flex-direction: row;
 `;
 
-const FooterButton = styled("div")`
-  flex: 1;
+const FooterAccept = styled("div")`
   display: flex;
   justify-content: flex-end;
+  margin-left: auto;
+`;
+
+const FooterInput = styled(TextInput)`
+  width: 230px;
+`;
+
+const FooterHideContainer = styled(HideContainer)`
+  width: 230px;
+  height: 38px;
 `;
 
 const FooterCheckContainer = styled("div")`
@@ -127,10 +145,12 @@ const FooterCheckContainer = styled("div")`
 `;
 
 export const App = () => {
+  const [addingShortcuts, setAddingShortcuts] = createSignal("");
   const [shortcuts, setShortcuts] = createSignal([]);
   const [search, setSearch] = createSignal("");
   const [path, setPath] = createSignal("");
   const [name, setName] = createSignal("");
+  const [args, setArgs] = createSignal("");
 
   const filteredItems = () => {
     const searchQuery = toLower(search());
@@ -159,13 +179,21 @@ export const App = () => {
 
   createEffect(() => emit(MESSAGES.GET_SHORTCUT));
 
+  createEffect(() => {
+    if (addingShortcuts()) {
+      setTimeout(() => {
+        setAddingShortcuts("");
+      }, 500);
+    }
+  });
+
   return (
     <Container>
       <Header>
         <Logo url="\" />
         <HeaderTitle>Shortcuts</HeaderTitle>
         <HeaderSearch>
-          <TextInput value={search()} onChange={setSearch} placeholder="Search" />
+          <TextInput value={search()} onInput={setSearch} placeholder="Search" />
         </HeaderSearch>
       </Header>
       <Main>
@@ -175,10 +203,18 @@ export const App = () => {
               <Item>
                 <ItemHeader>
                   <ItemTitle>{get(values, ["name"])}</ItemTitle>
+                  <Button
+                    datatype="secondary"
+                    onClick={() => {
+                      emit(MESSAGES.OPEN_PATH, values);
+                    }}
+                  >
+                    <LaunchIcon />
+                  </Button>
                 </ItemHeader>
                 <ItemButtons>
                   <Button
-                    name="warning"
+                    datatype="warning"
                     onClick={() => {
                       emit(MESSAGES.REMOVE_SHORTCUT, values);
                     }}
@@ -186,7 +222,7 @@ export const App = () => {
                     <Trashcan />
                   </Button>
                   <Button
-                    name="tertiary"
+                    datatype="tertiary"
                     onClick={() => {
                       emit(MESSAGES.STOP_SHORTCUT, values);
                     }}
@@ -212,17 +248,27 @@ export const App = () => {
                       });
                     }}
                   />
+                  <LockedInput
+                    value={get(values, ["arguments"], "")}
+                    onChange={(value) => {
+                      emit(MESSAGES.UPDATE_SHORTCUT, {
+                        ...values,
+                        arguments: value,
+                      });
+                    }}
+                    placeholder="Enter a arguments..."
+                  />
                 </ItemFooter>
               </Item>
             )}
           </For>
         </Items>
       </Main>
-      <Footer>
-        <FooterIcon>
+      <Footer datatype={addingShortcuts()}>
+        <FooterItem>
           <Button
             title={path()}
-            name="secondary"
+            datatype="secondary"
             onClick={async () => {
               const selected = (await openFile()) as string;
               setPath(selected);
@@ -231,33 +277,52 @@ export const App = () => {
             <FolderIcon />
           </Button>
           <FooterCheckContainer>{path() && <Checkmark />}</FooterCheckContainer>
-        </FooterIcon>
-        <FooterIcon>
-          <TextInput
-            name="secondary"
-            value={name()}
-            onChange={setName}
-            placeholder="Enter a name..."
-          />
+        </FooterItem>
+        <FooterItem>
+          {addingShortcuts() ? (
+            <FooterHideContainer />
+          ) : (
+            <FooterInput
+              type="secondary"
+              value={name()}
+              onInput={setName}
+              placeholder="Enter a name..."
+            />
+          )}
           <FooterCheckContainer>{name() && <Checkmark />}</FooterCheckContainer>
-        </FooterIcon>
-        <FooterButton>
+        </FooterItem>
+        <FooterItem>
+          {addingShortcuts() ? (
+            <FooterHideContainer />
+          ) : (
+            <FooterInput
+              type="secondary"
+              value={args()}
+              onInput={setArgs}
+              placeholder="Enter a arguments..."
+            />
+          )}
+        </FooterItem>
+        <FooterAccept>
           <Button
             disabled={isEmpty(name()) || isEmpty(path())}
             onClick={() => {
               emit(MESSAGES.ADD_SHORTCUT, {
+                id: v4(),
                 name: name(),
                 path: path(),
                 visibility: VISIBILITY.VISIBILE,
-                id: v4(),
+                arguments: args(),
               });
               setName("");
               setPath("");
+              setArgs("");
+              setAddingShortcuts("adding");
             }}
           >
             <Checkmark />
           </Button>
-        </FooterButton>
+        </FooterAccept>
       </Footer>
     </Container>
   );

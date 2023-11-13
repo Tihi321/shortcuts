@@ -5,3 +5,4 @@ pub const REMOVE_SHORTCUT: &str = "RemoveShortcut";
 pub const START_SHORTCUT: &str = "StartShortcut";
 pub const STOP_SHORTCUT: &str = "StopShortcut";
 pub const SHORTCUTS_UPDATE: &str = "ShortcutsUpdate";
+pub const OPEN_PATH: &str = "OpenPath";

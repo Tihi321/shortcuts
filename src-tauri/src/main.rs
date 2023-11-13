@@ -1,5 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod database;
+mod disk;
+mod terminal;
+mod utils;
+mod window;
+
 use serde_json::{self};
 
 use database::disk::create_db_directory;
@@ -14,16 +20,13 @@ use crate::{
         },
         structs::{Shortcut, Shortcuts},
     },
+    disk::disk::open_in_explorer,
     terminal::commands::{start_service, stop_service},
     window::messages::{
-        ADD_SHORTCUT, GET_SHORTCUT, REMOVE_SHORTCUT, SHORTCUTS_UPDATE, START_SHORTCUT,
+        ADD_SHORTCUT, GET_SHORTCUT, OPEN_PATH, REMOVE_SHORTCUT, SHORTCUTS_UPDATE, START_SHORTCUT,
         STOP_SHORTCUT, UPDATE_SHORTCUT,
     },
 };
-mod database;
-mod terminal;
-mod utils;
-mod window;
 
 fn main() {
     let db_path = create_db_directory().unwrap();
@@ -131,8 +134,7 @@ fn main() {
                 if let Some(value) = event.payload() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
-                            stop_service(&shortcut.path).unwrap();
-                            start_service(&shortcut.path, &shortcut.visibility).unwrap();
+                            start_service(&shortcut).unwrap();
                         }
                         Err(e) => eprintln!("Failed to parse event payload: {}", e),
                     }
@@ -162,6 +164,18 @@ fn main() {
                 } else {
                     // Handle the case where the window could not be found
                     eprintln!("Main window not found");
+                }
+            });
+
+            app.listen_global(OPEN_PATH, move |event| {
+                if let Some(value) = event.payload() {
+                    match serde_json::from_str::<Shortcut>(value) {
+                        Ok(shortcut) => match open_in_explorer(&shortcut.path) {
+                            Ok(_) => println!("Opened successfully"),
+                            Err(e) => eprintln!("Failed to open: {}", e),
+                        },
+                        Err(e) => eprintln!("Failed to parse event payload: {}", e),
+                    }
                 }
             });
 

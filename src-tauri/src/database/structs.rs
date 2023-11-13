@@ -6,6 +6,7 @@ pub struct Shortcut {
     pub(crate) visibility: String,
     pub(crate) name: String,
     pub(crate) path: String,
+    pub(crate) arguments: String,
 }
 
 #[derive(Serialize, Deserialize)]

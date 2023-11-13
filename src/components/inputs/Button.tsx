@@ -11,10 +11,11 @@ export const Button = styled("button")`
   font-weight: 600;
   line-height: 16px;
   letter-spacing: 0px;
+  width: 60px;
   text-align: center;
   color: ${(props) => props?.theme?.colors.text};
   background-color: ${(props) => {
-    switch (props?.name) {
+    switch (props?.datatype) {
       case "secondary":
         return props?.theme?.colors.ui3;
       case "tertiary":

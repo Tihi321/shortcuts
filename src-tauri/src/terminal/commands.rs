@@ -5,6 +5,7 @@ use std::process::Command;
 use winapi::um::wincon::GetConsoleWindow;
 use winapi::um::winuser::{ShowWindow, UpdateWindow, SW_HIDE};
 
+use crate::database::structs::Shortcut;
 use crate::utils::index::extract_before_exe;
 
 fn execute_hidden_command(command: &str) -> io::Result<bool> {
@@ -36,19 +37,26 @@ fn execute_hidden_command(command: &str) -> io::Result<bool> {
     Ok(true)
 }
 
-pub fn start_service(service_path: &str, visibility: &str) -> io::Result<bool> {
+pub fn start_service(shortcut: &Shortcut) -> io::Result<bool> {
     // Construct the PowerShell command to start the service
-    let path = Path::new(service_path);
+    let path = Path::new(&shortcut.path);
     let parent_folder = path
         .parent()
         .unwrap_or_else(|| Path::new("No parent directory found"));
 
-    let start_service_command = format!(
+    let mut start_service_command = format!(
         "Start-Process -FilePath '{0}' -WindowStyle {1} -WorkingDirectory \"{2}\"",
-        service_path,
-        visibility,
-        parent_folder.display()
+        &shortcut.path,
+        &shortcut.visibility,
+        parent_folder.display(),
     );
+
+    if &shortcut.arguments != "" {
+        start_service_command = format!(
+            "{0} -ArgumentList \"{1}\"",
+            &start_service_command, &shortcut.arguments,
+        );
+    }
 
     let _ = execute_hidden_command(&start_service_command);
 

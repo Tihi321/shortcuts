@@ -14,7 +14,6 @@ export const Button = styled("button")`
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  color: ${(props) => props?.theme?.colors.text};
   background: none;
   border: none;
 `;
@@ -25,6 +24,7 @@ const Label = styled("div")`
   justify-content: flex-start;
   align-items: center;
   font-size: 16px;
+  color: ${(props) => props?.theme?.colors.text};
 `;
 
 const CheckmarkBorder = styled("div")`

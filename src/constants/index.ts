@@ -6,6 +6,7 @@ export const MESSAGES = {
   START_SHORTCUT: "StartShortcut",
   STOP_SHORTCUT: "StopShortcut",
   SHORTCUTS_UPDATE: "ShortcutsUpdate",
+  OPEN_PATH: "OpenPath",
 };
 
 export const VISIBILITY = {
