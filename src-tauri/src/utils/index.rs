@@ -7,6 +7,6 @@ fn get_base_name(service_path: &str) -> &str {
     return file_name.to_str().unwrap();
 }
 
-pub fn extract_before_exe(input: &str) -> &str {
+pub fn extract_before_extension(input: &str) -> &str {
     return get_base_name(input);
 }

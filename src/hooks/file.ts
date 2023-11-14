@@ -8,7 +8,7 @@ export const openFile = async () => {
       filters: [
         {
           name: "Application",
-          extensions: ["exe"],
+          extensions: ["exe", "bat"],
         },
       ],
       // Optional: specify if multiple files can be selected

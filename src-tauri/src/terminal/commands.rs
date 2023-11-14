@@ -6,7 +6,7 @@ use winapi::um::wincon::GetConsoleWindow;
 use winapi::um::winuser::{ShowWindow, UpdateWindow, SW_HIDE};
 
 use crate::database::structs::Shortcut;
-use crate::utils::index::extract_before_exe;
+use crate::utils::index::extract_before_extension;
 
 fn execute_hidden_command(command: &str) -> io::Result<bool> {
     // Create a new command to execute the PowerShell script
@@ -65,7 +65,7 @@ pub fn start_service(shortcut: &Shortcut) -> io::Result<bool> {
 
 pub fn stop_service(service_path: &str) -> io::Result<bool> {
     // Construct the PowerShell command to start the service
-    let name = extract_before_exe(service_path);
+    let name = extract_before_extension(service_path);
     println!("{}", name);
     let stop_service_command = format!("taskkill /IM {0}.exe /F", name);
 
