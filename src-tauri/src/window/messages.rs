@@ -1,4 +1,4 @@
-pub const GET_SHORTCUT: &str = "GetShortcut";
+pub const GET_SHORTCUTS: &str = "GetShortcuts";
 pub const ADD_SHORTCUT: &str = "AddShortcut";
 pub const UPDATE_SHORTCUT: &str = "UpdateShortcut";
 pub const REMOVE_SHORTCUT: &str = "RemoveShortcut";

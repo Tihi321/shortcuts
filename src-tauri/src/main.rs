@@ -13,17 +13,16 @@ use tauri::Manager;
 
 use crate::{
     database::{
-        constants::DATABASE_PATH,
         disk::{
-            add_shortcut, read_shortcuts_from_file, read_shortcuts_from_file_as_string,
-            remove_shortcut, update_shortcut, write_shortcuts_to_file,
+            add_shortcut, read_shortcuts_from_directory, read_shortcuts_from_directory_as_string,
+            remove_shortcut, update_shortcut, write_shortcuts_to_directory,
         },
-        structs::{Shortcut, Shortcuts},
+        structs::Shortcut,
     },
     disk::disk::open_in_explorer,
     terminal::commands::{start_service, stop_service},
     window::messages::{
-        ADD_SHORTCUT, GET_SHORTCUT, OPEN_PATH, REMOVE_SHORTCUT, SHORTCUTS_UPDATE, START_SHORTCUT,
+        ADD_SHORTCUT, GET_SHORTCUTS, OPEN_PATH, REMOVE_SHORTCUT, SHORTCUTS_UPDATE, START_SHORTCUT,
         STOP_SHORTCUT, UPDATE_SHORTCUT,
     },
 };
@@ -44,17 +43,16 @@ fn main() {
                 if let Some(value) = event.payload() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
-                            let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
+                            let mut shortcuts_list = read_shortcuts_from_directory().unwrap();
 
-                            add_shortcut(&mut shortcuts, shortcut);
+                            add_shortcut(&mut shortcuts_list, shortcut);
 
                             // Write the updated shortcuts back to the file
-                            write_shortcuts_to_file(DATABASE_PATH, &shortcuts).unwrap();
+                            write_shortcuts_to_directory(&shortcuts_list).unwrap();
 
                             if let Some(window) = add_shortcut_handle.get_window("main") {
                                 // Serialize the shortcuts data to JSON
-                                let shortcuts_json = read_shortcuts_from_file_as_string();
+                                let shortcuts_json = read_shortcuts_from_directory_as_string();
 
                                 // Emit the event with the serialized shortcuts data
                                 window
@@ -74,17 +72,16 @@ fn main() {
                 if let Some(value) = event.payload() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
-                            let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
+                            let mut shortcuts_list = read_shortcuts_from_directory().unwrap();
 
-                            remove_shortcut(&mut shortcuts, shortcut.id);
+                            remove_shortcut(&mut shortcuts_list, &shortcut);
 
                             // Write the updated shortcuts back to the file
-                            write_shortcuts_to_file(DATABASE_PATH, &shortcuts).unwrap();
+                            write_shortcuts_to_directory(&shortcuts_list).unwrap();
 
                             if let Some(window) = remove_shortcut_handle.get_window("main") {
                                 // Serialize the shortcuts data to JSON
-                                let shortcuts_json = read_shortcuts_from_file_as_string();
+                                let shortcuts_json = read_shortcuts_from_directory_as_string();
 
                                 // Emit the event with the serialized shortcuts data
                                 window
@@ -104,17 +101,16 @@ fn main() {
                 if let Some(value) = event.payload() {
                     match serde_json::from_str::<Shortcut>(value) {
                         Ok(shortcut) => {
-                            let mut shortcuts = read_shortcuts_from_file(DATABASE_PATH)
-                                .unwrap_or_else(|_| Shortcuts { items: Vec::new() });
+                            let mut shortcuts_list = read_shortcuts_from_directory().unwrap();
 
-                            update_shortcut(&mut shortcuts, shortcut);
+                            update_shortcut(&mut shortcuts_list, shortcut);
 
                             // Write the updated shortcuts back to the file
-                            write_shortcuts_to_file(DATABASE_PATH, &shortcuts).unwrap();
+                            write_shortcuts_to_directory(&shortcuts_list).unwrap();
 
                             if let Some(window) = update_shortcut_handle.get_window("main") {
                                 // Serialize the shortcuts data to JSON
-                                let shortcuts_json = read_shortcuts_from_file_as_string();
+                                let shortcuts_json = read_shortcuts_from_directory_as_string();
 
                                 // Emit the event with the serialized shortcuts data
                                 window
@@ -152,10 +148,10 @@ fn main() {
                 }
             });
 
-            app.listen_global(GET_SHORTCUT, move |_| {
+            app.listen_global(GET_SHORTCUTS, move |_| {
                 if let Some(window) = get_shortcuts_handle.get_window("main") {
                     // Serialize the shortcuts data to JSON
-                    let shortcuts_json = read_shortcuts_from_file_as_string();
+                    let shortcuts_json = read_shortcuts_from_directory_as_string();
 
                     // Emit the event with the serialized shortcuts data
                     window

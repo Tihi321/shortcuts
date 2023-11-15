@@ -1,2 +1,2 @@
-pub const DATABASE_FOLDER: &str = "db";
-pub const DATABASE_PATH: &str = "db\\shortcuts.json";
+pub const SHORTCUTS_FOLDER: &str = "db\\shortcuts";
+pub const DATABASE_PATH: &str = "db\\shortcuts\\main.json";

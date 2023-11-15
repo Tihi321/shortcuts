@@ -166,7 +166,7 @@ export const App = () => {
 
       try {
         const data = JSON.parse(payload);
-        const dbShortcuts = get(data, ["items"], []);
+        const dbShortcuts = get(data, [0, "shortcuts"], []);
         setShortcuts(dbShortcuts);
       } catch (error) {
         console.log(error);
@@ -177,7 +177,7 @@ export const App = () => {
     return () => unlisten.then((fn) => fn());
   });
 
-  createEffect(() => emit(MESSAGES.GET_SHORTCUT));
+  createEffect(() => emit(MESSAGES.GET_SHORTCUTS));
 
   createEffect(() => {
     if (addingShortcuts()) {
@@ -308,6 +308,7 @@ export const App = () => {
             disabled={isEmpty(name()) || isEmpty(path())}
             onClick={() => {
               emit(MESSAGES.ADD_SHORTCUT, {
+                list: "main",
                 id: v4(),
                 name: name(),
                 path: path(),

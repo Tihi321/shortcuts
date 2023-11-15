@@ -1,5 +1,5 @@
 export const MESSAGES = {
-  GET_SHORTCUT: "GetShortcut",
+  GET_SHORTCUTS: "GetShortcuts",
   ADD_SHORTCUT: "AddShortcut",
   UPDATE_SHORTCUT: "UpdateShortcut",
   REMOVE_SHORTCUT: "RemoveShortcut",

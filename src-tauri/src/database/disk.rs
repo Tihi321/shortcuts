@@ -1,44 +1,98 @@
+use serde_json::Result as SerdeResult;
 use std::env;
 use std::fs;
 use std::io::Result;
-use std::path::Path;
 use std::path::PathBuf;
 
-use super::constants::DATABASE_FOLDER;
 use super::constants::DATABASE_PATH;
-use super::structs::{Shortcut, Shortcuts};
+use super::constants::SHORTCUTS_FOLDER;
+use super::structs::{Shortcut, ShortcutsList};
 
-pub fn add_shortcut(shortcuts: &mut Shortcuts, shortcut: Shortcut) {
-    shortcuts.items.push(shortcut);
-}
-
-pub fn remove_shortcut(shortcuts: &mut Shortcuts, id: String) {
-    shortcuts.items.retain(|value| value.id != id);
-}
-
-pub fn update_shortcut(shortcuts: &mut Shortcuts, shortcut: Shortcut) {
-    if let Some(item) = shortcuts
-        .items
-        .iter_mut()
-        .find(|value| value.id == shortcut.id)
-    {
-        *item = shortcut;
+pub fn add_shortcut(shortcuts_list: &mut Vec<ShortcutsList>, shortcut: Shortcut) {
+    // Find the ShortcutsList with the same list name
+    if let Some(list) = shortcuts_list.iter_mut().find(|x| x.list == shortcut.list) {
+        // Add the shortcut to the found ShortcutsList
+        list.shortcuts.push(shortcut);
     } else {
-        // If the item is not found, you might want to handle this case,
-        // for example, by adding the new item to the list.
-        shortcuts.items.push(shortcut);
+        // If no ShortcutsList with the same name exists, create a new one
+        let list_name = shortcut.list.clone();
+        shortcuts_list.push(ShortcutsList {
+            list: list_name,
+            shortcuts: vec![shortcut],
+        });
     }
 }
 
-pub fn read_shortcuts_from_file<P: AsRef<Path>>(file_path: P) -> Result<Shortcuts> {
-    let file_content = fs::read_to_string(file_path)?;
-    let shortcuts = serde_json::from_str(&file_content)?;
-    Ok(shortcuts)
+pub fn remove_shortcut(shortcuts_list: &mut Vec<ShortcutsList>, shortcut_to_remove: &Shortcut) {
+    // Find the ShortcutsList with the same list name
+    if let Some(list) = shortcuts_list
+        .iter_mut()
+        .find(|x| x.list == shortcut_to_remove.list)
+    {
+        // Find and remove the shortcut with the matching id
+        list.shortcuts
+            .retain(|shortcut| shortcut.id != shortcut_to_remove.id);
+    }
+    // Optionally, remove the ShortcutsList if it becomes empty
+    shortcuts_list.retain(|list| !list.shortcuts.is_empty());
 }
 
-pub fn read_shortcuts_from_file_as_string() -> String {
-    let shortcuts =
-        read_shortcuts_from_file(DATABASE_PATH).unwrap_or_else(|_| Shortcuts { items: Vec::new() });
+pub fn update_shortcut(shortcuts_list: &mut Vec<ShortcutsList>, updated_shortcut: Shortcut) {
+    // Find the ShortcutsList with the same list name
+    if let Some(list) = shortcuts_list
+        .iter_mut()
+        .find(|x| x.list == updated_shortcut.list)
+    {
+        // Find the shortcut with the matching id
+        if let Some(shortcut) = list
+            .shortcuts
+            .iter_mut()
+            .find(|x| x.id == updated_shortcut.id)
+        {
+            // Update the found shortcut
+            *shortcut = updated_shortcut;
+        } else {
+            // If the shortcut is not found, you can choose to add it or not.
+            // Uncomment the next line to add the shortcut if it's not found.
+            // list.shortcuts.push(updated_shortcut);
+        }
+    } else {
+        // If the ShortcutsList is not found, you might want to handle this case.
+        // For example, by creating a new ShortcutsList.
+        // Uncomment the following lines to create a new list if it's not found.
+        // let list_name = updated_shortcut.list.clone();
+        // shortcuts_list.push(ShortcutsList {
+        //     list: list_name,
+        //     shortcuts: vec![updated_shortcut],
+        // });
+    }
+}
+
+pub fn read_shortcuts_from_directory() -> Result<Vec<ShortcutsList>> {
+    let mut shortcuts_lists = Vec::new();
+
+    for entry in fs::read_dir(SHORTCUTS_FOLDER)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if path.is_file() && path.extension().and_then(std::ffi::OsStr::to_str) == Some("json") {
+            let content = fs::read_to_string(&path)?;
+            let mut shortcuts_list: ShortcutsList = serde_json::from_str(&content)?;
+
+            // Set the list field to the name of the file (without the extension)
+            if let Some(file_stem) = path.file_stem().and_then(std::ffi::OsStr::to_str) {
+                shortcuts_list.list = file_stem.to_string();
+            }
+
+            shortcuts_lists.push(shortcuts_list);
+        }
+    }
+
+    Ok(shortcuts_lists)
+}
+
+pub fn read_shortcuts_from_directory_as_string() -> String {
+    let shortcuts = read_shortcuts_from_directory().unwrap();
 
     // Serialize the shortcuts data to JSON
     let shortcuts_json = serde_json::to_string(&shortcuts).expect("Failed to serialize shortcuts");
@@ -46,18 +100,29 @@ pub fn read_shortcuts_from_file_as_string() -> String {
     return shortcuts_json;
 }
 
-pub fn write_shortcuts_to_file<P: AsRef<Path>>(file_path: P, shortcuts: &Shortcuts) -> Result<()> {
-    let json = serde_json::to_string_pretty(shortcuts)?;
-    fs::write(file_path, json)?;
+pub fn write_shortcuts_to_directory(shortcuts_lists: &[ShortcutsList]) -> SerdeResult<()> {
+    let mut shortcuts_dir = env::current_dir().unwrap();
+    shortcuts_dir.push(SHORTCUTS_FOLDER); // Make sure SHORTCUTS_FOLDER is defined
+
+    for shortcuts_list in shortcuts_lists {
+        let dir_path = shortcuts_dir.join(&shortcuts_list.list);
+        fs::create_dir_all(&dir_path).unwrap();
+
+        let json_file_path = dir_path.join("shortcuts.json");
+        let json = serde_json::to_string_pretty(&shortcuts_list.shortcuts)?;
+        fs::write(json_file_path, json).unwrap();
+    }
     Ok(())
 }
-
 pub fn create_db_directory() -> Result<PathBuf> {
     let mut db_path = env::current_dir()?;
-    db_path.push(DATABASE_FOLDER);
+    db_path.push(DATABASE_PATH);
 
-    if !db_path.exists() {
-        fs::create_dir(&db_path)?;
+    // Attempt to create the entire directory structure if it doesn't exist
+    if let Err(err) = fs::create_dir_all(&db_path) {
+        eprintln!("Error creating directories: {}", err);
+    } else {
+        println!("Directories created successfully");
     }
 
     Ok(db_path)

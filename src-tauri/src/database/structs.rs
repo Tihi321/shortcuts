@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Shortcut {
+    pub(crate) list: String,
     pub(crate) id: String,
     pub(crate) visibility: String,
     pub(crate) name: String,
@@ -10,6 +11,7 @@ pub struct Shortcut {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Shortcuts {
-    pub(crate) items: Vec<Shortcut>,
+pub struct ShortcutsList {
+    pub(crate) list: String,
+    pub(crate) shortcuts: Vec<Shortcut>,
 }
