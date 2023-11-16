@@ -4,7 +4,6 @@ use std::fs;
 use std::io::Result;
 use std::path::PathBuf;
 
-use super::constants::DATABASE_PATH;
 use super::constants::SHORTCUTS_FOLDER;
 use super::structs::{Shortcut, ShortcutsList};
 
@@ -77,14 +76,15 @@ pub fn read_shortcuts_from_directory() -> Result<Vec<ShortcutsList>> {
 
         if path.is_file() && path.extension().and_then(std::ffi::OsStr::to_str) == Some("json") {
             let content = fs::read_to_string(&path)?;
-            let mut shortcuts_list: ShortcutsList = serde_json::from_str(&content)?;
+            let shortcuts: Vec<Shortcut> = serde_json::from_str(&content).unwrap();
 
             // Set the list field to the name of the file (without the extension)
             if let Some(file_stem) = path.file_stem().and_then(std::ffi::OsStr::to_str) {
-                shortcuts_list.list = file_stem.to_string();
+                shortcuts_lists.push(ShortcutsList {
+                    list: file_stem.to_string(),
+                    shortcuts,
+                });
             }
-
-            shortcuts_lists.push(shortcuts_list);
         }
     }
 
@@ -105,10 +105,7 @@ pub fn write_shortcuts_to_directory(shortcuts_lists: &[ShortcutsList]) -> SerdeR
     shortcuts_dir.push(SHORTCUTS_FOLDER); // Make sure SHORTCUTS_FOLDER is defined
 
     for shortcuts_list in shortcuts_lists {
-        let dir_path = shortcuts_dir.join(&shortcuts_list.list);
-        fs::create_dir_all(&dir_path).unwrap();
-
-        let json_file_path = dir_path.join("shortcuts.json");
+        let json_file_path = shortcuts_dir.join(format!("{0}.json", &shortcuts_list.list));
         let json = serde_json::to_string_pretty(&shortcuts_list.shortcuts)?;
         fs::write(json_file_path, json).unwrap();
     }
@@ -116,7 +113,7 @@ pub fn write_shortcuts_to_directory(shortcuts_lists: &[ShortcutsList]) -> SerdeR
 }
 pub fn create_db_directory() -> Result<PathBuf> {
     let mut db_path = env::current_dir()?;
-    db_path.push(DATABASE_PATH);
+    db_path.push(SHORTCUTS_FOLDER);
 
     // Attempt to create the entire directory structure if it doesn't exist
     if let Err(err) = fs::create_dir_all(&db_path) {

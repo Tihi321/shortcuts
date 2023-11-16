@@ -164,6 +164,10 @@ export const App = () => {
     const unlisten = listen(MESSAGES.SHORTCUTS_UPDATE, (event: any) => {
       const payload = get(event, ["payload"], "{}");
 
+      console.log({
+        event,
+      });
+
       try {
         const data = JSON.parse(payload);
         const dbShortcuts = get(data, [0, "shortcuts"], []);
