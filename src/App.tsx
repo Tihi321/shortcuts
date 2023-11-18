@@ -23,6 +23,7 @@ import { Checkbox } from "./components/inputs/Checkbox";
 import { LockedInput } from "./components/inputs/LockedInput";
 import { LaunchIcon } from "./components/icons/Launch";
 import { HideContainer } from "./components/common/HideContainer";
+import { ShortcutTitle } from "./components/header/ShortcutTitle";
 
 const Container = styled("div")`
   margin: 0;
@@ -69,13 +70,6 @@ const ItemButtons = styled("div")`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-`;
-
-const ItemTitle = styled("div")`
-  padding: 8px;
-  font-weight: bold;
-  flex: 1;
-  color: ${(props) => props?.theme?.colors.text};
 `;
 
 const ItemHeader = styled("div")`
@@ -202,7 +196,15 @@ export const App = () => {
             {(values: object) => (
               <Item>
                 <ItemHeader>
-                  <ItemTitle>{get(values, ["name"])}</ItemTitle>
+                  <ShortcutTitle
+                    onChange={(value) => {
+                      emit(MESSAGES.UPDATE_SHORTCUT, {
+                        ...values,
+                        name: value,
+                      });
+                    }}
+                    text={get(values, ["name"])}
+                  />
                   <Button
                     datatype="secondary"
                     onClick={() => {
