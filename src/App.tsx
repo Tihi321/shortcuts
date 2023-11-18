@@ -1,7 +1,9 @@
-import { createSignal, createEffect, For } from "solid-js";
+import { createSignal, createEffect, For, createMemo } from "solid-js";
 import { styled } from "solid-styled-components";
 import { v4 } from "uuid";
 import get from "lodash/get";
+import find from "lodash/find";
+import head from "lodash/head";
 import filter from "lodash/filter";
 import toLower from "lodash/toLower";
 import isEmpty from "lodash/isEmpty";
@@ -22,7 +24,6 @@ import { Checkmark } from "./components/icons/Checkmark";
 import { Checkbox } from "./components/inputs/Checkbox";
 import { LockedInput } from "./components/inputs/LockedInput";
 import { LaunchIcon } from "./components/icons/Launch";
-import { HideContainer } from "./components/common/HideContainer";
 import { ShortcutTitle } from "./components/header/ShortcutTitle";
 
 const Container = styled("div")`
@@ -55,6 +56,59 @@ const HeaderTitle = styled("h2")`
 const Item = styled("div")`
   border-radius: 8px;
   padding: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  background-color: ${(props) => props?.theme?.colors.ui2};
+  border-width: 2px;
+  border-style: solid;
+  border-color: ${(props) => props?.theme?.colors.ui6};
+  height: 100%;
+  width: 100%;
+  flex-wrap: wrap;
+`;
+
+const ItemInputs = styled("div")`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const ItemButtons = styled("div")`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 0 16px;
+  gap: 4px;
+`;
+
+const ItemHeader = styled("div")`
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+`;
+
+const ItemFooter = styled("div")`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+`;
+
+const Tabs = styled("div")`
+  display: flex;
+  padding: 8px;
+  gap: 4px;
+`;
+
+interface TabProps {
+  selected?: boolean;
+}
+
+const Tab = styled("div")<TabProps>`
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px;
   display: inline-flex;
   flex-direction: column;
   gap: 8px;
@@ -62,25 +116,12 @@ const Item = styled("div")`
   background-color: ${(props) => props?.theme?.colors.ui2};
   border-width: 2px;
   border-style: solid;
-  border-color: ${(props) => props?.theme?.colors.ui6};
-  height: 100%;
-`;
+  border-color: ${(props) => (props.selected ? props?.theme?.colors.ui6 : "transparent")};
+  color: ${(props) => props?.theme?.colors.text};
 
-const ItemButtons = styled("div")`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const ItemHeader = styled("div")`
-  display: flex;
-  flex-direction: row;
-`;
-
-const ItemFooter = styled("div")`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
 const Main = styled("div")`
@@ -92,18 +133,30 @@ const Main = styled("div")`
 const Items = styled("div")`
   display: flex;
   height: 100%;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 8px;
+  width: 100%;
 `;
 
-const Footer = styled("div")`
+interface FooterProps {
+  show?: boolean;
+  adding?: boolean;
+}
+
+const Footer = styled("div")<FooterProps>`
+  position: fixed;
+  transform: ${(props) => (props.show ? "translateY(0)" : "translateY(55px)")};
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   padding: 8px;
   background-color: ${(props) => props?.theme?.colors.ui5};
-  opacity: ${(props) => (props?.datatype == "adding" ? 0.7 : 1)};
-  pointer-events: ${(props) => (props?.datatype == "adding" ? "none" : "all")};
+  opacity: ${(props) => (props?.adding ? 0.7 : 1)};
+  pointer-events: ${(props) => (props?.adding ? "none" : "all")};
+  transition: transform 0.3s ease;
 `;
 
 const HeaderSearch = styled("div")`
@@ -116,6 +169,13 @@ const FooterItem = styled("div")`
   flex-direction: row;
 `;
 
+const FooterItems = styled("div")`
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+`;
+
 const FooterAccept = styled("div")`
   display: flex;
   justify-content: flex-end;
@@ -126,9 +186,18 @@ const FooterInput = styled(TextInput)`
   width: 230px;
 `;
 
-const FooterHideContainer = styled(HideContainer)`
-  width: 230px;
-  height: 38px;
+const FooterTabButtons = styled("div")`
+  position: absolute;
+  display: flex;
+  gap: 4px;
+  top: -26px;
+  right: 12px;
+`;
+
+const FooterTabButton = styled(Button)`
+  padding: 4px 8px;
+  width: fit-content;
+  border-radius: 6px 6px 0 0;
 `;
 
 const FooterCheckContainer = styled("div")`
@@ -138,27 +207,52 @@ const FooterCheckContainer = styled("div")`
   align-items: center;
 `;
 
+const FooterSelect = styled("select")`
+  width: 160px;
+  border-radius: 6px;
+`;
+
+const sortAlphabetically = (values: Array<any>, key: string) =>
+  values.sort((first, second) => {
+    const nameA = toLower(get(first, [key]));
+    const nameB = toLower(get(second, [key]));
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+
 export const App = () => {
-  const [addingShortcuts, setAddingShortcuts] = createSignal("");
+  const [selectedTab, setSelectedTab] = createSignal("");
+  const [showFooter, setShowFooter] = createSignal(false);
+  const [footerItem, setFooterItem] = createSignal("");
+  const [addingItem, setAddingItem] = createSignal(false);
   const [shortcuts, setShortcuts] = createSignal([]);
   const [search, setSearch] = createSignal("");
   const [path, setPath] = createSignal("");
   const [name, setName] = createSignal("");
+  const [tabName, setTabName] = createSignal("");
+  const [tabRemoveName, setTabRemoveName] = createSignal("");
   const [args, setArgs] = createSignal("");
+
+  const selectedItems = createMemo(
+    () =>
+      find(shortcuts(), (values) => isEqual(get(values, ["list"]), selectedTab())) ||
+      head(shortcuts())
+  );
+
+  const tabItems = () => {
+    return sortAlphabetically(shortcuts(), "list") as unknown as object[];
+  };
 
   const filteredItems = () => {
     const searchQuery = toLower(search());
-    const items = filter(shortcuts(), (item) => {
+    const items = filter(get(selectedItems(), ["shortcuts"]), (item) => {
       return includes(toLower(get(item, ["name"])), searchQuery);
-    }).sort((first, second) => {
-      const nameA = toLower(get(first, ["name"]));
-      const nameB = toLower(get(second, ["name"]));
-      if (nameA < nameB) return -1;
-      if (nameA > nameB) return 1;
-      return 0;
     });
 
-    return items;
+    sortAlphabetically(items, "name");
+
+    return sortAlphabetically(items, "name") as unknown as object[];
   };
 
   createEffect(() => {
@@ -166,9 +260,7 @@ export const App = () => {
       const payload = get(event, ["payload"], "{}");
 
       try {
-        const data = JSON.parse(payload);
-        const dbShortcuts = get(data, [0, "shortcuts"], []);
-        setShortcuts(dbShortcuts);
+        setShortcuts(JSON.parse(payload));
       } catch (error) {
         console.log(error);
       }
@@ -181,9 +273,9 @@ export const App = () => {
   createEffect(() => emit(MESSAGES.GET_SHORTCUTS));
 
   createEffect(() => {
-    if (addingShortcuts()) {
+    if (addingItem()) {
       setTimeout(() => {
-        setAddingShortcuts("");
+        setAddingItem(false);
       }, 500);
     }
   });
@@ -197,6 +289,24 @@ export const App = () => {
           <TextInput value={search()} onInput={setSearch} placeholder="Search" />
         </HeaderSearch>
       </Header>
+      <Tabs>
+        <For each={tabItems()}>
+          {(values: object, index) => (
+            <Tab
+              selected={
+                isEqual(get(values, ["list"]), selectedTab()) ||
+                tabItems().length === 1 ||
+                (isEmpty(selectedTab()) && index() === 0)
+              }
+              onClick={() => {
+                setSelectedTab(get(values, ["list"]));
+              }}
+            >
+              {get(values, ["list"])}
+            </Tab>
+          )}
+        </For>
+      </Tabs>
       <Main>
         <Items>
           <For each={filteredItems()}>
@@ -221,34 +331,34 @@ export const App = () => {
                     <LaunchIcon />
                   </Button>
                 </ItemHeader>
-                <ItemButtons>
-                  <Button
-                    datatype="warning"
-                    onClick={() => {
-                      emit(MESSAGES.REMOVE_SHORTCUT, values);
-                    }}
-                  >
-                    <Trashcan />
-                  </Button>
-                  <Button
-                    datatype="tertiary"
-                    onClick={() => {
-                      emit(MESSAGES.STOP_SHORTCUT, values);
-                    }}
-                  >
-                    <Cube />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      emit(MESSAGES.START_SHORTCUT, values);
-                    }}
-                  >
-                    <Arrow />
-                  </Button>
-                </ItemButtons>
-                <ItemFooter>
+                <ItemInputs>
+                  <ItemButtons>
+                    <Button
+                      datatype="warning"
+                      onClick={() => {
+                        emit(MESSAGES.REMOVE_SHORTCUT, values);
+                      }}
+                    >
+                      <Trashcan />
+                    </Button>
+                    <Button
+                      datatype="tertiary"
+                      onClick={() => {
+                        emit(MESSAGES.STOP_SHORTCUT, values);
+                      }}
+                    >
+                      <Cube />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        emit(MESSAGES.START_SHORTCUT, values);
+                      }}
+                    >
+                      <Arrow />
+                    </Button>
+                  </ItemButtons>
                   <Checkbox
-                    label="Hidden (shell)"
+                    label="Hidden"
                     checked={isEqual(get(values, ["visibility"]), VISIBILITY.HIDDEN)}
                     onChange={(value) => {
                       emit(MESSAGES.UPDATE_SHORTCUT, {
@@ -257,6 +367,9 @@ export const App = () => {
                       });
                     }}
                   />
+                </ItemInputs>
+
+                <ItemFooter>
                   <LockedInput
                     value={get(values, ["arguments"], "")}
                     onChange={(value) => {
@@ -273,66 +386,143 @@ export const App = () => {
           </For>
         </Items>
       </Main>
-      <Footer datatype={addingShortcuts()}>
-        <FooterItem>
-          <Button
-            title={path()}
-            datatype="secondary"
-            onClick={async () => {
-              const selected = (await openFile()) as string;
-              setPath(selected);
-            }}
-          >
-            <FolderIcon />
-          </Button>
-          <FooterCheckContainer>{path() && <Checkmark />}</FooterCheckContainer>
-        </FooterItem>
-        <FooterItem>
-          {addingShortcuts() ? (
-            <FooterHideContainer />
-          ) : (
-            <FooterInput
-              type="secondary"
-              value={name()}
-              onInput={setName}
-              placeholder="Enter a name..."
-            />
-          )}
-          <FooterCheckContainer>{name() && <Checkmark />}</FooterCheckContainer>
-        </FooterItem>
-        <FooterItem>
-          {addingShortcuts() ? (
-            <FooterHideContainer />
-          ) : (
-            <FooterInput
-              type="secondary"
-              value={args()}
-              onInput={setArgs}
-              placeholder="Enter a arguments..."
-            />
-          )}
-        </FooterItem>
-        <FooterAccept>
-          <Button
-            disabled={isEmpty(name()) || isEmpty(path())}
+      <Footer adding={addingItem()} show={showFooter()}>
+        <FooterTabButtons>
+          <FooterTabButton
+            disabled={isEmpty(selectedItems())}
+            datatype={footerItem() === "Shortcut" ? "" : "secondary"}
             onClick={() => {
-              emit(MESSAGES.ADD_SHORTCUT, {
-                list: "main",
-                id: v4(),
-                name: name(),
-                path: path(),
-                visibility: VISIBILITY.VISIBILE,
-                arguments: args(),
-              });
-              setName("");
-              setPath("");
-              setArgs("");
-              setAddingShortcuts("adding");
+              if (showFooter() && footerItem() !== "Shortcut") {
+                setFooterItem("Shortcut");
+              } else {
+                setShowFooter(!showFooter());
+              }
             }}
           >
-            <Checkmark />
-          </Button>
-        </FooterAccept>
+            Shortcut
+          </FooterTabButton>
+          <FooterTabButton
+            datatype={footerItem() !== "Shortcut" ? "" : "secondary"}
+            onClick={() => {
+              if (showFooter() && footerItem() !== "Tab") {
+                setFooterItem("Tab");
+              } else {
+                setShowFooter(!showFooter());
+              }
+            }}
+          >
+            Tab
+          </FooterTabButton>
+        </FooterTabButtons>
+        {!addingItem() && footerItem() === "Shortcut" && (
+          <FooterItems>
+            <FooterItem>
+              <Button
+                title={path()}
+                datatype="secondary"
+                onClick={async () => {
+                  const selected = (await openFile()) as string;
+                  setPath(selected);
+                }}
+              >
+                <FolderIcon />
+              </Button>
+              <FooterCheckContainer>{path() && <Checkmark />}</FooterCheckContainer>
+            </FooterItem>
+            <FooterItem>
+              <FooterInput
+                type="secondary"
+                value={name()}
+                onInput={setName}
+                placeholder="Enter a name..."
+              />
+              <FooterCheckContainer>{name() && <Checkmark />}</FooterCheckContainer>
+            </FooterItem>
+            <FooterItem>
+              <FooterInput
+                type="secondary"
+                value={args()}
+                onInput={setArgs}
+                placeholder="Enter a arguments..."
+              />
+              <FooterCheckContainer></FooterCheckContainer>
+            </FooterItem>
+            <FooterAccept>
+              <Button
+                disabled={isEmpty(name()) || isEmpty(path())}
+                onClick={() => {
+                  emit(MESSAGES.ADD_SHORTCUT, {
+                    list: get(selectedItems(), ["list"]),
+                    id: v4(),
+                    name: name(),
+                    path: path(),
+                    visibility: VISIBILITY.VISIBILE,
+                    arguments: args(),
+                  });
+                  setName("");
+                  setPath("");
+                  setArgs("");
+                  setAddingItem(true);
+                }}
+              >
+                <Checkmark />
+              </Button>
+            </FooterAccept>
+          </FooterItems>
+        )}
+        {!addingItem() && footerItem() !== "Shortcut" && (
+          <FooterItems>
+            <FooterItem>
+              <FooterInput
+                type="secondary"
+                value={tabName()}
+                onInput={setTabName}
+                placeholder="Enter a name..."
+              />
+              <FooterCheckContainer>{name() && <Checkmark />}</FooterCheckContainer>
+            </FooterItem>
+            <FooterAccept>
+              <Button
+                disabled={isEmpty(tabName())}
+                onClick={() => {
+                  emit(MESSAGES.ADD_TAB, {
+                    name: tabName(),
+                  });
+                  setTabName("");
+                  setAddingItem(true);
+                }}
+              >
+                <Checkmark />
+              </Button>
+            </FooterAccept>
+            <FooterSelect
+              onChange={(event) => {
+                setTabRemoveName(event.currentTarget.value);
+              }}
+            >
+              <For each={tabItems()}>
+                {(values: object) => (
+                  <option value={get(values, ["list"])}>{get(values, ["list"])}</option>
+                )}
+              </For>
+            </FooterSelect>
+            <FooterAccept>
+              <Button
+                datatype="warning"
+                disabled={isEmpty(tabRemoveName())}
+                onClick={() => {
+                  emit(MESSAGES.REMOVE_TAB, {
+                    name: tabRemoveName(),
+                  });
+                  setTabRemoveName("");
+                  setAddingItem(true);
+                }}
+              >
+                <Trashcan />
+              </Button>
+            </FooterAccept>
+          </FooterItems>
+        )}
       </Footer>
     </Container>
   );
