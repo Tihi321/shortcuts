@@ -111,6 +111,26 @@ pub fn write_shortcuts_to_directory(shortcuts_lists: &[ShortcutsList]) -> SerdeR
     }
     Ok(())
 }
+
+pub fn remove_shortcuts_db_file(name: &str) -> Result<bool> {
+    let mut shortcuts_dir = env::current_dir()?;
+    shortcuts_dir.push(SHORTCUTS_FOLDER);
+
+    let file_name = format!("{0}.json", &name);
+    // Construct the full path to the file
+    let mut file_path = PathBuf::from(shortcuts_dir);
+    file_path.push(file_name);
+
+    // Check if the file exists, and if so, remove it
+    if file_path.exists() {
+        fs::remove_file(file_path).expect("Failed to remove file");
+        println!("File removed successfully.");
+    } else {
+        println!("File does not exist.");
+    }
+    Ok(true)
+}
+
 pub fn create_db_directory() -> Result<PathBuf> {
     let mut db_path = env::current_dir()?;
     db_path.push(SHORTCUTS_FOLDER);

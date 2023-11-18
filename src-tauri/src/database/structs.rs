@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub struct Tab {
+    pub(crate) name: String,
+}
+#[derive(Serialize, Deserialize)]
 pub struct Shortcut {
     pub(crate) list: String,
     pub(crate) id: String,

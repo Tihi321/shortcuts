@@ -1,5 +1,4 @@
 import { styled } from "solid-styled-components";
-import { alpha } from "../../utils";
 
 export const Button = styled("button")`
   display: inline-flex;
@@ -41,11 +40,6 @@ export const Button = styled("button")`
 
   &:hover {
     filter: ${(props) => `drop-shadow(2px 1px 2px ${props?.theme?.colors.ui6})`};
-  }
-
-  &:focus,
-  &:active {
-    outline: 2px solid ${(props) => alpha(props?.theme?.colors.ui1, 0.4)};
   }
 
   &:disabled {

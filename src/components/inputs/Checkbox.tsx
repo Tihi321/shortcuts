@@ -25,6 +25,7 @@ const Label = styled("div")`
   align-items: center;
   font-size: 16px;
   color: ${(props) => props?.theme?.colors.text};
+  margin-left: 8px;
 `;
 
 const CheckmarkBorder = styled("div")`
