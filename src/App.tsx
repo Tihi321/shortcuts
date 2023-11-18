@@ -148,10 +148,17 @@ export const App = () => {
 
   const filteredItems = () => {
     const searchQuery = toLower(search());
-
-    return filter(shortcuts(), (item) => {
+    const items = filter(shortcuts(), (item) => {
       return includes(toLower(get(item, ["name"])), searchQuery);
+    }).sort((first, second) => {
+      const nameA = toLower(get(first, ["name"]));
+      const nameB = toLower(get(second, ["name"]));
+      if (nameA < nameB) return -1;
+      if (nameA > nameB) return 1;
+      return 0;
     });
+
+    return items;
   };
 
   createEffect(() => {
