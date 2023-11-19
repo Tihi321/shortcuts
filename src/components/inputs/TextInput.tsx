@@ -21,7 +21,6 @@ const Input = styled("input")`
   border-radius: 6px;
   text-align: left;
   width: 100%;
-  max-width: 230px;
   color: ${(props) => props?.theme?.colors.ui6};
   background-color: ${(props) => {
     switch (props?.datatype) {

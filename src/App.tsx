@@ -25,6 +25,7 @@ import { Checkbox } from "./components/inputs/Checkbox";
 import { LockedInput } from "./components/inputs/LockedInput";
 import { LaunchIcon } from "./components/icons/Launch";
 import { ShortcutTitle } from "./components/header/ShortcutTitle";
+import { Tab } from "./components/header/Tab";
 
 const Container = styled("div")`
   margin: 0;
@@ -101,29 +102,6 @@ const Tabs = styled("div")`
   gap: 4px;
 `;
 
-interface TabProps {
-  selected?: boolean;
-}
-
-const Tab = styled("div")<TabProps>`
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 8px;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 50px;
-  background-color: ${(props) => props?.theme?.colors.ui2};
-  border-width: 2px;
-  border-style: solid;
-  border-color: ${(props) => (props.selected ? props?.theme?.colors.ui6 : "transparent")};
-  color: ${(props) => props?.theme?.colors.text};
-
-  &:hover {
-    opacity: 0.7;
-  }
-`;
-
 const Main = styled("div")`
   display: flex;
   padding: 8px;
@@ -189,7 +167,6 @@ const FooterInput = styled(TextInput)`
 const FooterTabButtons = styled("div")`
   position: absolute;
   display: flex;
-  gap: 4px;
   top: -26px;
   right: 12px;
 `;
@@ -198,6 +175,17 @@ const FooterTabButton = styled(Button)`
   padding: 4px 8px;
   width: fit-content;
   border-radius: 6px 6px 0 0;
+  transform: scale(0.7) translateY(5px);
+
+  &:hover {
+    transform: scale(1) translateY(0px);
+  }
+
+  transition: transform 0.3s ease;
+
+  &:first-child {
+    margin-right: -18px;
+  }
 `;
 
 const FooterCheckContainer = styled("div")`
@@ -301,9 +289,18 @@ export const App = () => {
               onClick={() => {
                 setSelectedTab(get(values, ["list"]));
               }}
-            >
-              {get(values, ["list"])}
-            </Tab>
+              text={get(values, ["list"])}
+              onChange={(value) => {
+                console.log({
+                  value,
+                });
+
+                emit(MESSAGES.RENAME_TAB, {
+                  current: get(values, ["list"]),
+                  new: value,
+                });
+              }}
+            />
           )}
         </For>
       </Tabs>
@@ -395,6 +392,7 @@ export const App = () => {
               if (showFooter() && footerItem() !== "Shortcut") {
                 setFooterItem("Shortcut");
               } else {
+                setFooterItem("Shortcut");
                 setShowFooter(!showFooter());
               }
             }}
@@ -407,6 +405,7 @@ export const App = () => {
               if (showFooter() && footerItem() !== "Tab") {
                 setFooterItem("Tab");
               } else {
+                setFooterItem("Tab");
                 setShowFooter(!showFooter());
               }
             }}

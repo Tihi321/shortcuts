@@ -1,24 +1,43 @@
 import { createSignal } from "solid-js";
 import { styled } from "solid-styled-components";
 
-const Container = styled("div")`
-  cursor: default;
-  padding: 8px;
-  font-weight: bold;
-  flex: 1;
-  color: ${(props) => props?.theme?.colors.text};
-  user-select: none;
-`;
-
-export interface ShortcutTitleProps {
-  text: string;
-  onChange: (value: string) => void;
+interface ContainerProps {
+  selected?: boolean;
 }
 
-export const ShortcutTitle = ({ text, onChange }: ShortcutTitleProps) => {
+const Container = styled("div")<ContainerProps>`
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 50px;
+  background-color: ${(props) => props?.theme?.colors.ui2};
+  border-width: 2px;
+  border-style: solid;
+  border-color: ${(props) => (props.selected ? props?.theme?.colors.ui6 : "transparent")};
+  color: ${(props) => props?.theme?.colors.text};
+  user-select: none;
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+export interface TabProps {
+  selected?: boolean;
+  text: string;
+  onChange: (value: string) => void;
+  onClick: () => void;
+}
+
+export const Tab = ({ text, onChange, onClick, selected }: TabProps) => {
   const [updateTitle, setUpdateTitle] = createSignal(false);
   return (
     <Container
+      selected={selected}
+      onClick={onClick}
       contenteditable={updateTitle()}
       onDblClick={(event) => {
         event.currentTarget.focus();

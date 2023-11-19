@@ -1,5 +1,6 @@
 pub const GET_SHORTCUTS: &str = "GetShortcuts";
 pub const ADD_TAB: &str = "AddTab";
+pub const RENAME_TAB: &str = "RenameTab";
 pub const REMOVE_TAB: &str = "RemoveTab";
 pub const ADD_SHORTCUT: &str = "AddShortcut";
 pub const UPDATE_SHORTCUT: &str = "UpdateShortcut";

@@ -6,6 +6,8 @@ mod terminal;
 mod utils;
 mod window;
 
+use std::env;
+
 use serde_json::{self};
 
 use database::disk::create_db_directory;
@@ -13,17 +15,18 @@ use tauri::Manager;
 
 use crate::{
     database::{
+        constants::SHORTCUTS_FOLDER,
         disk::{
             add_shortcut, read_shortcuts_from_directory, read_shortcuts_from_directory_as_string,
-            remove_shortcut, remove_shortcuts_db_file, update_shortcut,
-            write_shortcuts_to_directory,
+            remove_shortcut, remove_shortcuts_db_file, rename_shortcuts_db_file, update_shortcut,
+            write_shortcut_to_directory, write_shortcuts_to_directory,
         },
-        structs::{Shortcut, ShortcutsList, Tab},
+        structs::{RenameTab, Shortcut, Tab},
     },
     disk::disk::open_in_explorer,
     terminal::commands::{start_service, stop_service},
     window::messages::{
-        ADD_SHORTCUT, ADD_TAB, GET_SHORTCUTS, OPEN_PATH, REMOVE_SHORTCUT, REMOVE_TAB,
+        ADD_SHORTCUT, ADD_TAB, GET_SHORTCUTS, OPEN_PATH, REMOVE_SHORTCUT, REMOVE_TAB, RENAME_TAB,
         SHORTCUTS_UPDATE, START_SHORTCUT, STOP_SHORTCUT, UPDATE_SHORTCUT,
     },
 };
@@ -40,6 +43,7 @@ fn main() {
             let add_shortcut_handle = app_handle.clone();
             let add_tab_handle = app_handle.clone();
             let remove_tab_handle = app_handle.clone();
+            let rename_tab_handle = app_handle.clone();
             let get_shortcuts_handle = app_handle.clone();
 
             app.listen_global(ADD_SHORTCUT, move |event| {
@@ -75,14 +79,11 @@ fn main() {
                 if let Some(value) = event.payload() {
                     match serde_json::from_str::<Tab>(value) {
                         Ok(tab) => {
-                            let mut shortcuts_list = read_shortcuts_from_directory().unwrap();
+                            let mut shortcuts_dir = env::current_dir().unwrap();
+                            shortcuts_dir.push(SHORTCUTS_FOLDER);
 
-                            shortcuts_list.push(ShortcutsList {
-                                list: tab.name,
-                                shortcuts: Vec::new(),
-                            });
-
-                            write_shortcuts_to_directory(&shortcuts_list).unwrap();
+                            let _ =
+                                write_shortcut_to_directory(&Vec::new(), &tab.name, &shortcuts_dir);
 
                             if let Some(window) = add_tab_handle.get_window("main") {
                                 // Serialize the shortcuts data to JSON
@@ -109,6 +110,29 @@ fn main() {
                             remove_shortcuts_db_file(&tab.name).unwrap();
 
                             if let Some(window) = remove_tab_handle.get_window("main") {
+                                // Serialize the shortcuts data to JSON
+                                let shortcuts_json = read_shortcuts_from_directory_as_string();
+
+                                // Emit the event with the serialized shortcuts data
+                                window
+                                    .emit(SHORTCUTS_UPDATE, shortcuts_json)
+                                    .expect("Failed to emit event");
+                            } else {
+                                // Handle the case where the window could not be found
+                                eprintln!("Main window not found");
+                            }
+                        }
+                        Err(e) => eprintln!("Failed to parse event payload: {}", e),
+                    }
+                }
+            });
+
+            app.listen_global(RENAME_TAB, move |event| {
+                if let Some(value) = event.payload() {
+                    match serde_json::from_str::<RenameTab>(value) {
+                        Ok(tab) => {
+                            rename_shortcuts_db_file(&tab.current, &tab.new).unwrap();
+                            if let Some(window) = rename_tab_handle.get_window("main") {
                                 // Serialize the shortcuts data to JSON
                                 let shortcuts_json = read_shortcuts_from_directory_as_string();
 

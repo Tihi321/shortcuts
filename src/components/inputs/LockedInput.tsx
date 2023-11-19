@@ -13,7 +13,6 @@ type TLockedInputProps = {
 
 const Container = styled("div")`
   display: flex;
-  width: 200px;
   gap: 8px;
 `;
 
@@ -21,7 +20,7 @@ const Text = styled("div")`
   display: flex;
   flex: 1;
   align-items: center;
-  justify-content: center;
+  text-align: left;
   font-size: 16px;
   color: ${(props) => props?.theme?.colors.text};
   width: 100%;

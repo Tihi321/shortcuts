@@ -2,6 +2,7 @@ use serde_json::Result as SerdeResult;
 use std::env;
 use std::fs;
 use std::io::Result;
+use std::path::Path;
 use std::path::PathBuf;
 
 use super::constants::SHORTCUTS_FOLDER;
@@ -75,7 +76,7 @@ pub fn read_shortcuts_from_directory() -> Result<Vec<ShortcutsList>> {
         let path = entry.path();
 
         if path.is_file() && path.extension().and_then(std::ffi::OsStr::to_str) == Some("json") {
-            let content = fs::read_to_string(&path)?;
+            let content = fs::read_to_string(&path).unwrap();
             let shortcuts: Vec<Shortcut> = serde_json::from_str(&content).unwrap();
 
             // Set the list field to the name of the file (without the extension)
@@ -100,20 +101,34 @@ pub fn read_shortcuts_from_directory_as_string() -> String {
     return shortcuts_json;
 }
 
+pub fn write_shortcut_to_directory(
+    shortcuts: &Vec<Shortcut>,
+    name: &str,
+    shortcuts_dir: &PathBuf,
+) -> SerdeResult<()> {
+    let json_file_path = shortcuts_dir.join(format!("{0}.json", &name));
+    let json = serde_json::to_string_pretty(&shortcuts)?;
+    fs::write(json_file_path, json).unwrap();
+    Ok(())
+}
+
 pub fn write_shortcuts_to_directory(shortcuts_lists: &[ShortcutsList]) -> SerdeResult<()> {
     let mut shortcuts_dir = env::current_dir().unwrap();
     shortcuts_dir.push(SHORTCUTS_FOLDER); // Make sure SHORTCUTS_FOLDER is defined
 
     for shortcuts_list in shortcuts_lists {
-        let json_file_path = shortcuts_dir.join(format!("{0}.json", &shortcuts_list.list));
-        let json = serde_json::to_string_pretty(&shortcuts_list.shortcuts)?;
-        fs::write(json_file_path, json).unwrap();
+        write_shortcut_to_directory(
+            &shortcuts_list.shortcuts,
+            &shortcuts_list.list,
+            &shortcuts_dir,
+        )
+        .unwrap();
     }
     Ok(())
 }
 
 pub fn remove_shortcuts_db_file(name: &str) -> Result<bool> {
-    let mut shortcuts_dir = env::current_dir()?;
+    let mut shortcuts_dir = env::current_dir().unwrap();
     shortcuts_dir.push(SHORTCUTS_FOLDER);
 
     let file_name = format!("{0}.json", &name);
@@ -128,6 +143,26 @@ pub fn remove_shortcuts_db_file(name: &str) -> Result<bool> {
     } else {
         println!("File does not exist.");
     }
+    Ok(true)
+}
+
+pub fn rename_shortcuts_db_file(name: &str, new_name: &str) -> Result<bool> {
+    let mut shortcuts_dir = env::current_dir().unwrap();
+    shortcuts_dir.push(SHORTCUTS_FOLDER);
+    let file_path = PathBuf::from(shortcuts_dir);
+
+    let old_path = Path::new(&file_path).join(format!("{0}.json", &name));
+
+    let content = fs::read_to_string(&old_path).unwrap();
+    let mut shortcuts: Vec<Shortcut> = serde_json::from_str(&content).unwrap();
+
+    for shortcut in shortcuts.iter_mut() {
+        shortcut.list = new_name.to_string();
+    }
+
+    let _ = remove_shortcuts_db_file(name).unwrap();
+    let _ = write_shortcut_to_directory(&shortcuts, &new_name, &file_path).unwrap();
+
     Ok(true)
 }
 

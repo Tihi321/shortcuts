@@ -4,6 +4,12 @@ use serde::{Deserialize, Serialize};
 pub struct Tab {
     pub(crate) name: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct RenameTab {
+    pub(crate) current: String,
+    pub(crate) new: String,
+}
 #[derive(Serialize, Deserialize)]
 pub struct Shortcut {
     pub(crate) list: String,
