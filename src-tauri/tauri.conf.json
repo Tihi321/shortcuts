@@ -1,4 +1,7 @@
 {
+  "productName": "shortcuts",
+  "version": "0.0.0",
+  "identifier": "shortcuts.tihomir-selak.from.hr",
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
@@ -16,9 +19,6 @@
       "icons/icon.ico"
     ]
   },
-  "productName": "shortcuts",
-  "version": "0.0.0",
-  "identifier": "shortcuts.tihomir-selak.from.hr",
   "plugins": {},
   "app": {
     "windows": [
