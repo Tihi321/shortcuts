@@ -255,7 +255,7 @@ export const App = () => {
     });
 
     // Cleanup listener when component is unmounted
-    return () => unlisten.then((fn) => fn());
+    return () => unlisten.then((fn: any) => fn());
   });
 
   createEffect(() => emit(MESSAGES.GET_SHORTCUTS));
