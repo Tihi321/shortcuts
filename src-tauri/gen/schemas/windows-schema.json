@@ -169,6 +169,13 @@
                       ]
                     },
                     {
+                      "description": "shell:allow-spawn -> Enables the spawn command without any pre-configured scope.",
+                      "type": "string",
+                      "enum": [
+                        "shell:allow-spawn"
+                      ]
+                    },
+                    {
                       "description": "shell:allow-stdin-write -> Enables the stdin_write command without any pre-configured scope.",
                       "type": "string",
                       "enum": [
@@ -197,6 +204,13 @@
                       ]
                     },
                     {
+                      "description": "shell:deny-spawn -> Denies the spawn command without any pre-configured scope.",
+                      "type": "string",
+                      "enum": [
+                        "shell:deny-spawn"
+                      ]
+                    },
+                    {
                       "description": "shell:deny-stdin-write -> Denies the stdin_write command without any pre-configured scope.",
                       "type": "string",
                       "enum": [
@@ -217,6 +231,14 @@
                       "sidecar"
                     ],
                     "properties": {
+                      "name": {
+                        "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                        "type": "string"
+                      },
+                      "cmd": {
+                        "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+                        "type": "string"
+                      },
                       "args": {
                         "description": "The allowed arguments for the command execution.",
                         "allOf": [
@@ -224,14 +246,6 @@
                             "$ref": "#/definitions/ShellAllowedArgs"
                           }
                         ]
-                      },
-                      "cmd": {
-                        "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
-                        "type": "string"
-                      },
-                      "name": {
-                        "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
-                        "type": "string"
                       },
                       "sidecar": {
                         "description": "If this command is a sidecar command.",
@@ -252,6 +266,14 @@
                       "sidecar"
                     ],
                     "properties": {
+                      "name": {
+                        "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                        "type": "string"
+                      },
+                      "cmd": {
+                        "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+                        "type": "string"
+                      },
                       "args": {
                         "description": "The allowed arguments for the command execution.",
                         "allOf": [
@@ -259,14 +281,6 @@
                             "$ref": "#/definitions/ShellAllowedArgs"
                           }
                         ]
-                      },
-                      "cmd": {
-                        "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
-                        "type": "string"
-                      },
-                      "name": {
-                        "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
-                        "type": "string"
                       },
                       "sidecar": {
                         "description": "If this command is a sidecar command.",
@@ -1059,6 +1073,13 @@
           ]
         },
         {
+          "description": "shell:allow-spawn -> Enables the spawn command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "shell:allow-spawn"
+          ]
+        },
+        {
           "description": "shell:allow-stdin-write -> Enables the stdin_write command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -1084,6 +1105,13 @@
           "type": "string",
           "enum": [
             "shell:deny-open"
+          ]
+        },
+        {
+          "description": "shell:deny-spawn -> Denies the spawn command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "shell:deny-spawn"
           ]
         },
         {
@@ -1318,6 +1346,13 @@
           ]
         },
         {
+          "description": "webview:allow-set-webview-zoom -> Enables the set_webview_zoom command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "webview:allow-set-webview-zoom"
+          ]
+        },
+        {
           "description": "webview:allow-webview-close -> Enables the webview_close command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -1395,6 +1430,13 @@
           ]
         },
         {
+          "description": "webview:deny-set-webview-zoom -> Denies the set_webview_zoom command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "webview:deny-set-webview-zoom"
+          ]
+        },
+        {
           "description": "webview:deny-webview-close -> Denies the webview_close command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -1455,6 +1497,13 @@
           "type": "string",
           "enum": [
             "window:allow-current-monitor"
+          ]
+        },
+        {
+          "description": "window:allow-cursor-position -> Enables the cursor_position command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window:allow-cursor-position"
           ]
         },
         {
@@ -1808,6 +1857,13 @@
           ]
         },
         {
+          "description": "window:allow-start-resize-dragging -> Enables the start_resize_dragging command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window:allow-start-resize-dragging"
+          ]
+        },
+        {
           "description": "window:allow-theme -> Enables the theme command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -1875,6 +1931,13 @@
           "type": "string",
           "enum": [
             "window:deny-current-monitor"
+          ]
+        },
+        {
+          "description": "window:deny-cursor-position -> Denies the cursor_position command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window:deny-cursor-position"
           ]
         },
         {
@@ -2228,6 +2291,13 @@
           ]
         },
         {
+          "description": "window:deny-start-resize-dragging -> Denies the start_resize_dragging command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window:deny-start-resize-dragging"
+          ]
+        },
+        {
           "description": "window:deny-theme -> Denies the theme command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -2358,6 +2428,22 @@
         }
       ]
     },
+    "ShellAllowedArgs": {
+      "description": "A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration.",
+      "anyOf": [
+        {
+          "description": "Use a simple boolean to allow all or disable all arguments to this command configuration.",
+          "type": "boolean"
+        },
+        {
+          "description": "A specific set of [`ShellAllowedArg`] that are valid to call for the command configuration.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ShellAllowedArg"
+          }
+        }
+      ]
+    },
     "ShellAllowedArg": {
       "description": "A command argument allowed to be executed by the webview API.",
       "anyOf": [
@@ -2378,22 +2464,6 @@
             }
           },
           "additionalProperties": false
-        }
-      ]
-    },
-    "ShellAllowedArgs": {
-      "description": "A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration.",
-      "anyOf": [
-        {
-          "description": "Use a simple boolean to allow all or disable all arguments to this command configuration.",
-          "type": "boolean"
-        },
-        {
-          "description": "A specific set of [`ShellAllowedArg`] that are valid to call for the command configuration.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ShellAllowedArg"
-          }
         }
       ]
     }

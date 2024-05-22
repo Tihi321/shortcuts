@@ -4,26 +4,26 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "CACHE_MODE=development && vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "start": "tauri dev",
+    "start": "CACHE_MODE=development && tauri dev",
     "tauri-build": "tauri build",
     "tauri-build-debug": "tauri build --debug"
   },
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/plugin-dialog": "^2.0.0-beta.2",
-    "@tauri-apps/plugin-shell": "^2.0.0-beta.2",
+    "@tauri-apps/plugin-dialog": "^2.0.0-beta.3",
+    "@tauri-apps/plugin-shell": "^2.0.0-beta.4",
     "lodash": "^4.17.21",
     "solid-js": "^1.7.8",
     "solid-styled-components": "^0.28.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@tauri-apps/api": "2.0.0-beta.6",
-    "@tauri-apps/cli": "^2.0.0-beta.11",
+    "@tauri-apps/api": "2.0.0-beta.11",
+    "@tauri-apps/cli": "^2.0.0-beta.17",
     "@types/lodash": "^4.14.201",
     "@types/uuid": "^9.0.7",
     "typescript": "^5.0.2",

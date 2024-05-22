@@ -21,15 +21,7 @@
   },
   "plugins": {},
   "app": {
-    "windows": [
-      {
-        "fullscreen": false,
-        "resizable": true,
-        "title": "Shortcuts",
-        "width": 750,
-        "height": 500
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": null
     }

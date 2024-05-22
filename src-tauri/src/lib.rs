@@ -25,6 +25,7 @@ use crate::{
     },
     disk::disk::open_in_explorer,
     terminal::commands::{start_service, stop_service},
+    utils::index::create_window,
     window::messages::{
         ADD_SHORTCUT, ADD_TAB, GET_SHORTCUTS, OPEN_PATH, REMOVE_SHORTCUT, REMOVE_TAB, RENAME_TAB,
         SHORTCUTS_UPDATE, START_SHORTCUT, STOP_SHORTCUT, UPDATE_SHORTCUT,
@@ -48,6 +49,8 @@ pub fn run() {
             let remove_tab_handle = app_handle.clone();
             let rename_tab_handle = app_handle.clone();
             let get_shortcuts_handle = app_handle.clone();
+
+            let _ = create_window(&app).unwrap();
 
             app.listen_any(ADD_SHORTCUT, move |event| {
                 let value = event.payload();
