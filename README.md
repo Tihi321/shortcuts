@@ -32,6 +32,11 @@ cargo run ./main.rs
 yarn start
 ```
 
+## Isntall Rust
+
+./scripts/rustup-init.exe -y
+./scripts/update_version.bat
+
 ### Rust Update
 
 ```bash
