@@ -29,7 +29,7 @@ cargo run ./main.rs
 ### Start
 
 ```bash
-yarn tauri dev
+yarn start
 ```
 
 ### Rust Update
