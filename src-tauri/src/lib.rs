@@ -11,7 +11,7 @@ use std::env;
 use serde_json::{self};
 
 use database::disk::create_db_directory;
-use tauri::Manager;
+use tauri::{Emitter, Listener, Manager};
 
 use crate::{
     database::{
@@ -52,7 +52,7 @@ pub fn run() {
 
             let _ = create_window(&app).unwrap();
 
-            app.listen_any(ADD_SHORTCUT, move |event| {
+            app.listen(ADD_SHORTCUT, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<ShortcutReceived>(value) {
                     Ok(shortcut_received) => {
@@ -88,7 +88,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(ADD_TAB, move |event| {
+            app.listen(ADD_TAB, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Tab>(value) {
                     Ok(tab) => {
@@ -114,7 +114,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(REMOVE_TAB, move |event| {
+            app.listen(REMOVE_TAB, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Tab>(value) {
                     Ok(tab) => {
@@ -137,7 +137,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(RENAME_TAB, move |event| {
+            app.listen(RENAME_TAB, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<RenameTab>(value) {
                     Ok(tab) => {
@@ -159,7 +159,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(REMOVE_SHORTCUT, move |event| {
+            app.listen(REMOVE_SHORTCUT, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Shortcut>(value) {
                     Ok(shortcut) => {
@@ -187,7 +187,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(UPDATE_SHORTCUT, move |event| {
+            app.listen(UPDATE_SHORTCUT, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Shortcut>(value) {
                     Ok(shortcut) => {
@@ -215,7 +215,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(START_SHORTCUT, move |event| {
+            app.listen(START_SHORTCUT, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Shortcut>(value) {
                     Ok(shortcut) => {
@@ -225,7 +225,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(STOP_SHORTCUT, move |event| {
+            app.listen(STOP_SHORTCUT, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Shortcut>(value) {
                     Ok(shortcut) => {
@@ -235,7 +235,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(GET_SHORTCUTS, move |_| {
+            app.listen(GET_SHORTCUTS, move |_| {
                 if let Some(window) = get_shortcuts_handle.get_webview_window("main") {
                     // Serialize the shortcuts data to JSON
                     let shortcuts_json = read_shortcuts_from_directory_as_string();
@@ -250,7 +250,7 @@ pub fn run() {
                 }
             });
 
-            app.listen_any(OPEN_PATH, move |event| {
+            app.listen(OPEN_PATH, move |event| {
                 let value = event.payload();
                 match serde_json::from_str::<Shortcut>(value) {
                     Ok(shortcut) => match open_in_explorer(&shortcut.path) {
