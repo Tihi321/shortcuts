@@ -1,0 +1,39 @@
+---
+description: Coding preferences
+globs: 
+alwaysApply: false
+---
+# Coding Preferences
+
+## Component Structure
+- **Modular Components**: Prefer smaller, focused components with single responsibility
+- **Co-located Styles**: Keep component styles in the same file as the component code
+  - This naturally encourages smaller components as files with both code and styles get unwieldy if too large
+- **Single File Pattern**: Each component should be self-contained in a single file with both logic and styling
+
+## Styling Approach
+- **CSS-First**: Prefer native CSS solutions over JavaScript-based styling when possible
+- **Solid-Styled-Components**: Use solid-styled-components for component-scoped styling
+- **Avoid Inline Styles**: Keep styles in the styled component definitions rather than inline
+
+## Animation & Effects
+- **CSS Animations**: Prefer CSS animations and transitions over JavaScript-driven animations
+- **Minimize Observers**: Avoid unnecessary reactive observers when simpler solutions exist
+- **Declarative Approach**: Use declarative patterns rather than imperative state management when possible
+
+## State Management
+- **Minimal State**: Keep state as local as possible to components that need it
+- **Avoid Counters**: Minimize use of counters and numeric state tracking when alternatives exist
+- **Props Down, Events Up**: Follow the pattern of passing props down and events up
+
+## Code Organization
+- **Feature-Based Structure**: Organize components by feature rather than type
+- **Consistent Naming**: Use consistent naming conventions for files and components
+- **Clear Interfaces**: Define clear props interfaces for components
+
+## Performance Considerations
+- **Memoization**: Use memoization for expensive computations, but don't over-optimize
+- **Lazy Loading**: Implement lazy loading for components not needed on initial render
+- **Avoid Premature Optimization**: Focus on clean, readable code first, then optimize if needed
+
+These preferences aim to create a maintainable, performant codebase with clear separation of concerns and minimal complexity.

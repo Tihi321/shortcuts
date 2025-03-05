@@ -1,0 +1,39 @@
+---
+description: Tech Stack
+globs: 
+alwaysApply: false
+---
+# Shortcuts App Technology Stack
+
+## Frontend
+- **Framework**: [SolidJS](mdc:https:/www.solidjs.com) (v1.9.5) - A declarative, efficient, and flexible JavaScript library for building user interfaces
+- **Styling**: [solid-styled-components](mdc:https:/github.com/solidjs/solid-styled-components) (v0.28.5) - CSS-in-JS styling solution for SolidJS
+- **Build Tool**: [Vite](mdc:https:/vitejs.dev) (v5.3.1) with vite-plugin-solid for SolidJS integration
+- **Language**: TypeScript (v5.4.5)
+
+## Backend
+- **Framework**: [Tauri](mdc:https:/tauri.app) (v2.3.1) - Framework for building lightweight, secure desktop applications
+- **Language**: Rust (v1.77.1)
+- **Plugins**:
+  - tauri-plugin-dialog (v2.2.0) - For native file dialogs
+  - tauri-plugin-shell (v2.2.0) - For shell command execution
+
+## Database
+- **Type**: JSON file-based database
+- **Structure**: Stored in `src-tauri/db/shortcuts` directory
+
+## Additional Libraries
+- **Utilities**:
+  - lodash (v4.17.21) - JavaScript utility library
+  - uuid (v9.0.1) - For generating unique identifiers
+
+## Development Environment
+- **Package Manager**: Yarn
+- **Cross-platform Support**: Windows support via winapi integration
+
+## Project Structure
+- `/src` - SolidJS frontend code
+- `/src-tauri` - Rust backend code
+- `/src-tauri/db` - JSON database storage
+
+This application is designed to manage shortcuts with a modern SolidJS frontend and a performant Rust backend using Tauri, with data persisted in JSON files.
