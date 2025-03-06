@@ -61,7 +61,7 @@ pub fn run() {
                             id: shortcut_received.id,
                             visibility: shortcut_received.visibility,
                             name: shortcut_received.name,
-                            path: shortcut_received.path.path,
+                            path: shortcut_received.path,
                             arguments: shortcut_received.arguments,
                         };
                         let mut shortcuts_list = read_shortcuts_from_directory().unwrap();

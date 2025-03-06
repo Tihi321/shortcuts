@@ -30,7 +30,7 @@ pub struct ShortcutReceived {
     pub(crate) id: String,
     pub(crate) visibility: String,
     pub(crate) name: String,
-    pub(crate) path: Path,
+    pub(crate) path: String,
     pub(crate) arguments: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
