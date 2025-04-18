@@ -14,16 +14,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/plugin-dialog": "^2.2.0",
-    "@tauri-apps/plugin-shell": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "^2.2.1",
+    "@tauri-apps/plugin-shell": "^2.2.1",
     "lodash": "^4.17.21",
     "solid-js": "^1.9.5",
     "solid-styled-components": "^0.28.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@tauri-apps/api": "2.4.0",
-    "@tauri-apps/cli": "2.4.0",
+    "@tauri-apps/api": "2.5.0",
+    "@tauri-apps/cli": "2.5.0",
     "@types/lodash": "^4.14.201",
     "@types/uuid": "^9.0.7",
     "cross-env": "^7.0.3",
